@@ -24,6 +24,11 @@ var commentary = 0;
 var evidence = 0;
 var nullChar = 0;
 
+var summaryUpdate = false;
+var commentaryUpdate = false;
+var evidenceUpdate = false;
+var nullUpdate = false;
+
 function onOpen(e) {
   DocumentApp.getUi().createAddonMenu()
       .addItem('Start', 'showSidebar')
@@ -90,7 +95,7 @@ function statsLogger(){
       while(true){
         
         color = atts.getBackgroundColor(i);
-        if('#f3f315' == color){
+        if(color == '#f3f315'){
           summary++;
         }
         else if('#0dd5fc' == color){
@@ -116,25 +121,44 @@ function statsLogger(){
   var evidenceStats = evidence/(summary+commentary+evidence+nullChar);
   var nullCharStats = nullChar/(summary+commentary+evidence+nullChar);
   
-  Logger.log('Summary: ' + summary + 'chars');
+  Logger.log('Summary:' + summary + 'chars');
   Logger.log(summaryStats);
-  Logger.log('Commentary: ' + commentary + 'chars');
+  Logger.log('Commentary:' + commentary + 'chars');
   Logger.log(commentaryStats);
-  Logger.log('Evidence: ' + evidence + 'chars');
+  Logger.log('Evidence:' + evidence + 'chars');
   Logger.log(evidenceStats);
-  Logger.log('Nulls: ' + nullChar + 'chars');
+  Logger.log('Nulls:' + nullChar + 'chars');
   Logger.log(nullCharStats);
   
-  var remainder = Math.floor(summaryStats) + Math.floor(commentaryStats) + Math.floor(evidenceStats) + Math.floor(nullCharStats);
-  remainder = Math.round(100-remainder);
-  
-  
-  var test = 0.027916251246261216;
-  var test2 = 0.027916251246261216*100-2;
-  Logger.log('TEST: ' + test2);
-  
+  var stats = [summaryStats, commentaryStats, evidenceStats, nullCharStats];
+  Logger.log('reached the end!');
   return stats;
 }
 
-//updates the stats when add-on is started
+function summaryLogger(){
+   //Logger.log('summaryLogger checkpoint');
+   var paras = DocumentApp.getActiveDocument().getBody().getParagraphs();
+   summary = 0;
+   for(var x in paras){
+      try{
+         atts = paras[x].editAsText();
+         var i = 0
+         while(true){
+         
+            color = atts.getBackgroundColor(i);
+            if(color == '#f3f315'){
+               summary++;
+            }
+            i++;
+         }
+      }
+      catch(e){
+         continue;
+      }
+   var summaryReturn = summary/(summary+commentary+evidence+nullChar);
+   return summaryReturn;
+   }
+}
+
+//updates code-editor-log on add-on start about the doc's stats
 statsLogger();
