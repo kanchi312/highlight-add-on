@@ -6,45 +6,84 @@
     <!-- The CSS package above applies Google styling to buttons and other elements. -->
 
     <style>
-
+    .square {
+    float: left;
+    width: 20px;
+    height: 20px;
+    margin: 3px;
+    border: 1px solid rgba(0, 0, 0, .2);
+    }
     </style>
   </head>
   <body>
      
      <div id="button-summary">
+          <div class="square" style="background:#f3f315"></div>
           <button id="summary-text">Summary</button>
+          <label id="summary-label">summary%</label>
      </div>
      <div id="button-commentary">
+          <div class="square" style="background:#0dd5fc"></div>
           <button id="commentary-text">Commentary</button>
+          <label id="commentary-label">commentary%</label>
      </div>
      <div id="button-evidence">
+          <div class="square" style="background:#39ff14"></div>
           <button id="evidence-text">Evidence</button>
+          <label id="evidence-label">evidence%</label>
      </div>
      <div id="button-unmarked">
+          <div class="square" style="background:white"></div>
           <button id="unmarked-text">Unmarked</button>
+          <label id="unmarked-label">unmarked%</label>
      </div>
+     
+     <script src="https://www.gstatic.com/firebasejs/5.8.2/firebase.js"></script>
+     <script>
+     // Initialize Firebase
+     var config = {
+     apiKey: "AIzaSyAxmmhzrNDT5k6OdaimK1qO2lF5JKMDLvY",
+     authDomain: "highlight-add-on.firebaseapp.com",
+     databaseURL: "https://highlight-add-on.firebaseio.com",
+     projectId: "highlight-add-on",
+     storageBucket: "highlight-add-on.appspot.com",
+     messagingSenderId: "1040624767535"
+     };
+     firebase.initializeApp(config);
+     </script>
      
      <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js">
      </script>
 
 <script>
+//callback function
+function onSuccess(stat){
+   $('#summary-label').text(Math.floor(stat[0]*10000)/100 + '%');
+   $('#commentary-label').text(Math.floor(stat[1]*10000)/100 + '%');
+   $('#evidence-label').text(Math.floor(stat[2]*10000)/100 + '%');
+   $('#unmarked-label').text(Math.floor(stat[3]*10000)/100 + '%');
+}
+//updates side-menu when add-on is started
+google.script.run.withSuccessHandler(onSuccess).statsLogger();
+
 // Attach click handlers after the Sidebar has loaded in Google Docs
+// & update stats on google servers + update the 
 $(function() {
 
    $('#summary-text').click(function() {
-     google.script.run.highlightText("#F3F315");
+     google.script.run.withSuccessHandler(onSuccess).highlightText("#f3f315");
    });
    
    $('#commentary-text').click(function() {
-     google.script.run.highlightText("#0dd5fc");
+     google.script.run.withSuccessHandler(onSuccess).highlightText("#0dd5fc");
    });
    
    $('#evidence-text').click(function() {
-     google.script.run.highlightText('#39FF14');
+     google.script.run.withSuccessHandler(onSuccess).highlightText('#39ff14');
    });
    
    $('#unmarked-text').click(function() {
-     google.script.run.highlightText(null);
+     google.script.run.withSuccessHandler(onSuccess).highlightText(null);
    });
    
    

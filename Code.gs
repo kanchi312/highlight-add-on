@@ -17,6 +17,13 @@
  *     determine which authorization mode (ScriptApp.AuthMode) the trigger is
  *     running in, inspect e.authMode.
  */
+
+//GLOBALS
+var summary = 0;
+var commentary = 0;
+var evidence = 0;
+var nullChar = 0;
+
 function onOpen(e) {
   DocumentApp.getUi().createAddonMenu()
       .addItem('Start', 'showSidebar')
@@ -66,4 +73,68 @@ if (selection) {
     }
   }
 }
-}  
+  return statsLogger();
+}
+
+function statsLogger(){
+  var paras = DocumentApp.getActiveDocument().getBody().getParagraphs();
+  summary = 0;
+  commentary = 0;
+  evidence = 0;
+  nullChar = 0;
+  
+  for(var x in paras){
+    try{
+      atts = paras[x].editAsText();
+      var i = 0
+      while(true){
+        
+        color = atts.getBackgroundColor(i);
+        if('#f3f315' == color){
+          summary++;
+        }
+        else if('#0dd5fc' == color){
+          commentary++;
+        }
+        else if('#39ff14' == color){
+          evidence++;
+        }
+        else{
+          nullChar++;
+        }
+        i++
+      }
+    }
+    
+    catch(e){
+      continue;
+    }
+  }
+  
+  var summaryStats = summary/(summary+commentary+evidence+nullChar);
+  var commentaryStats = commentary/(summary+commentary+evidence+nullChar);
+  var evidenceStats = evidence/(summary+commentary+evidence+nullChar);
+  var nullCharStats = nullChar/(summary+commentary+evidence+nullChar);
+  
+  Logger.log('Summary: ' + summary + 'chars');
+  Logger.log(summaryStats);
+  Logger.log('Commentary: ' + commentary + 'chars');
+  Logger.log(commentaryStats);
+  Logger.log('Evidence: ' + evidence + 'chars');
+  Logger.log(evidenceStats);
+  Logger.log('Nulls: ' + nullChar + 'chars');
+  Logger.log(nullCharStats);
+  
+  var remainder = Math.floor(summaryStats) + Math.floor(commentaryStats) + Math.floor(evidenceStats) + Math.floor(nullCharStats);
+  remainder = Math.round(100-remainder);
+  
+  
+  var test = 0.027916251246261216;
+  var test2 = 0.027916251246261216*100-2;
+  Logger.log('TEST: ' + test2);
+  
+  return stats;
+}
+
+//updates the stats when add-on is started
+statsLogger();
